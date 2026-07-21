@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Will you go on a date with me? 💖</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
 
         :root {
             --primary: #ff4081;
@@ -15,13 +15,17 @@
             --text-color: #d81b60;
             --light-pink: #fff0f3;
             --grey: #dcdde1;
+            --rose: #e84393;
+            --gold: #ffd700;
         }
+
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
             padding: 0;
             font-family: 'Fredoka', sans-serif;
-            background-color: var(--bg-pink);
+            background: linear-gradient(135deg, #ffe6eb 0%, #fff0f3 50%, #ffccdd 100%);
             color: var(--text-color);
             display: flex;
             justify-content: center;
@@ -31,162 +35,311 @@
             position: relative;
         }
 
+        /* Dynamic Background Animation */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 80%, rgba(255, 192, 203, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 105, 180, 0.1) 0%, transparent 50%);
+            animation: gradientShift 15s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Rose Petals */
+        .rose-petal {
+            position: absolute;
+            pointer-events: none;
+            font-size: 1.5rem;
+            animation: fallRose 8s linear forwards;
+            opacity: 0.8;
+        }
+
+        @keyframes fallRose {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
         /* Ambient floating hearts */
         .bg-heart {
             position: absolute;
-            color: rgba(255, 128, 171, 0.25);
+            color: rgba(255, 128, 171, 0.3);
             font-size: 20px;
             pointer-events: none;
-            animation: floatUp 6s linear infinite;
+            animation: floatUp 8s linear infinite;
             bottom: -50px;
+            text-shadow: 0 0 20px rgba(255, 64, 129, 0.3);
+        }
+
+        /* Sparkle Effect */
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ffeb3b;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: sparkleAnim 1.5s ease-out forwards;
+            box-shadow: 0 0 10px rgba(255, 235, 59, 0.8);
+        }
+
+        @keyframes sparkleAnim {
+            0% { 
+                opacity: 1;
+                transform: scale(1) translate(0, 0);
+            }
+            100% { 
+                opacity: 0;
+                transform: scale(0) translate(var(--tx), var(--ty));
+            }
         }
 
         .screen {
             display: none;
             text-align: center;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.97);
             padding: 40px;
-            border-radius: 30px;
-            box-shadow: 0 15px 35px rgba(216, 27, 96, 0.15);
-            max-width: 480px;
+            border-radius: 35px;
+            box-shadow: 0 20px 60px rgba(216, 27, 96, 0.25);
+            max-width: 500px;
             width: 90%;
             z-index: 5;
-            backdrop-filter: blur(5px);
-            border: 4px solid #fff;
+            backdrop-filter: blur(10px);
+            border: 4px solid rgba(255, 255, 255, 0.8);
             max-height: 90vh;
             overflow-y: auto;
+            position: relative;
+            animation: screenEntry 0s ease-out;
         }
 
-        /* Custom Scrollbar for smaller screens */
-        .screen::-webkit-scrollbar { width: 6px; }
-        .screen::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+        /* Glow border effect for screens */
+        .screen::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 35px;
+            padding: 2px;
+            background: linear-gradient(135deg, #ff80ab, #ff4081, #ff80ab);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            animation: glowPulse 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        /* Hide scrollbars but keep scroll functionality */
+        .screen::-webkit-scrollbar { display: none; }
+        .screen { -ms-overflow-style: none; scrollbar-width: none; }
 
         .screen.active {
             display: block;
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes screenEntry {
+            0% { transform: scale(0.8) rotateX(20deg); opacity: 0; }
+            100% { transform: scale(1) rotateX(0deg); opacity: 1; }
         }
 
         h1 {
-            font-size: 2.2rem;
+            font-size: 2.4rem;
             margin-bottom: 10px;
-            text-shadow: 1px 1px 0px rgba(255,255,255,0.8);
+            background: linear-gradient(135deg, var(--primary), var(--rose));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
             line-height: 1.2;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
         }
 
-        /* Cute popping text when they hover NO */
         .pleading-text {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             color: var(--primary);
-            font-weight: 600;
-            min-height: 35px;
+            font-weight: 700;
+            min-height: 40px;
             margin-bottom: 15px;
             opacity: 0;
             font-style: italic;
+            text-shadow: 0 0 10px rgba(255, 64, 129, 0.3);
         }
 
         .pop-text-anim {
-            animation: popText 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            animation: popText 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
         .hearts-banner {
-            font-size: 3.5rem;
-            margin-bottom: 10px;
+            font-size: 4rem;
+            margin-bottom: 15px;
             display: inline-block;
+            animation: heartFloat 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(255, 64, 129, 0.4));
         }
 
-        .pulse { animation: beat 0.8s infinite alternate cubic-bezier(0.25, 0.8, 0.25, 1); }
+        .hearts-banner.pulse { animation: heartBeat 1s ease-in-out infinite, heartFloat 3s ease-in-out infinite; }
 
-        /* Buttons */
+        @keyframes heartFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* Enhanced Buttons */
         .btn {
-            background-color: var(--accent);
+            background: linear-gradient(135deg, var(--accent), var(--primary));
             color: white;
             border: none;
             padding: 16px 36px;
             font-size: 1.25rem;
             font-family: inherit;
-            font-weight: 600;
+            font-weight: 700;
             border-radius: 50px;
             cursor: pointer;
             margin: 10px;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 6px 20px rgba(255, 128, 171, 0.4);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 25px rgba(255, 64, 129, 0.35);
             outline: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn:hover:not(:disabled) {
-            background-color: var(--primary-hover);
-            transform: scale(1.08) translateY(-2px);
-            box-shadow: 0 8px 25px rgba(245, 0, 87, 0.5);
+            background: linear-gradient(135deg, var(--primary-hover), var(--rose));
+            transform: scale(1.1) translateY(-3px);
+            box-shadow: 0 12px 35px rgba(245, 0, 87, 0.6);
+            letter-spacing: 1px;
         }
 
-        .btn:active:not(:disabled) { transform: scale(0.98) translateY(0); }
+        .btn:active:not(:disabled) { 
+            transform: scale(0.98) translateY(0);
+            box-shadow: 0 4px 15px rgba(245, 0, 87, 0.4);
+        }
 
         .btn:disabled {
-            background-color: var(--grey);
-            color: #a1a2a6;
+            background: linear-gradient(135deg, #ccc, #aaa);
+            color: #888;
             cursor: not-allowed;
             box-shadow: none;
             transform: none;
         }
 
-        #yes-btn { background-color: var(--primary); z-index: 10; position: relative;}
-
-        #no-btn {
-            background-color: #fff;
-            color: var(--text-color);
-            border: 2px solid var(--accent);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            z-index: 9999;
-            transition: transform 0.2s, background-color 0.2s; 
+        #yes-btn { 
+            background: linear-gradient(135deg, var(--primary), var(--rose));
+            z-index: 10; 
+            position: relative;
         }
 
-        /* --- CUSTOM CALENDAR UI --- */
+        #no-btn {
+            background: linear-gradient(135deg, #fff, #fff5f7);
+            color: var(--text-color);
+            border: 3px solid var(--accent);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            z-index: 9999;
+        }
+
+        #no-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #fff0f3, #ffe6eb);
+            border-color: var(--primary);
+        }
+
+        /* Custom Calendar UI */
         .custom-picker-container {
             margin: 20px 0;
-            background: #fff;
-            border: 3px solid var(--bg-pink);
-            border-radius: 20px;
-            padding: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            background: linear-gradient(135deg, #fff5f7, #fff);
+            border: 3px solid var(--accent);
+            border-radius: 25px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(255, 64, 129, 0.15);
         }
 
         .calendar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-weight: 600;
-            font-size: 1.2rem;
+            font-weight: 700;
+            font-size: 1.3rem;
             margin-bottom: 15px;
             color: var(--primary-hover);
+            text-shadow: 0 2px 4px rgba(216, 27, 96, 0.1);
         }
 
         .calendar-nav {
             cursor: pointer;
-            background: var(--bg-pink);
-            width: 30px;
-            height: 30px;
+            background: linear-gradient(135deg, var(--bg-pink), var(--accent));
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: 0.2s;
+            transition: all 0.3s;
             user-select: none;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(255, 64, 129, 0.2);
         }
-        .calendar-nav:hover { background: var(--accent); color: white; }
+        .calendar-nav:hover { 
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            color: white;
+            transform: scale(1.15) rotate(10deg);
+            box-shadow: 0 6px 20px rgba(255, 64, 129, 0.4);
+        }
 
         .days-of-week {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--accent);
-            margin-bottom: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
+            gap: 8px;
         }
 
         .day-cell {
@@ -194,119 +347,225 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 12px;
+            border-radius: 15px;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
             font-size: 1rem;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border: 2px solid transparent;
+            background: linear-gradient(135deg, #fff5f7, #fff);
         }
 
         .day-cell:hover:not(.disabled) {
-            background: var(--bg-pink);
+            background: linear-gradient(135deg, var(--light-pink), var(--bg-pink));
             border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 6px 15px rgba(255, 64, 129, 0.25);
         }
 
         .day-cell.selected {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--rose));
             color: white;
-            border-color: var(--primary);
-            box-shadow: 0 4px 10px rgba(255, 64, 129, 0.4);
-            transform: scale(1.1);
+            border-color: var(--primary-hover);
+            box-shadow: 0 8px 20px rgba(255, 64, 129, 0.5);
+            transform: scale(1.15) translateY(-2px);
+            font-weight: 700;
         }
 
         .day-cell.disabled {
-            color: #ccc;
+            color: #ddd;
             cursor: not-allowed;
             background: transparent;
         }
 
-        /* --- CUSTOM TIME PICKER UI --- */
+        /* Time Picker */
         .time-picker-container {
             margin-top: 20px;
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
             justify-content: center;
         }
 
         .time-pill {
-            background: var(--bg-pink);
+            background: linear-gradient(135deg, #fff5f7, #fff);
             color: var(--text-color);
-            padding: 10px 18px;
-            border-radius: 20px;
-            font-weight: 600;
+            padding: 12px 22px;
+            border-radius: 25px;
+            font-weight: 700;
             cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.2s;
+            border: 2px solid var(--accent);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(255, 64, 129, 0.1);
         }
 
         .time-pill:hover {
-            border-color: var(--accent);
-            transform: translateY(-2px);
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(255, 64, 129, 0.25);
+            background: linear-gradient(135deg, var(--light-pink), var(--bg-pink));
         }
 
         .time-pill.selected {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--rose));
             color: white;
-            box-shadow: 0 4px 10px rgba(255, 64, 129, 0.4);
-            transform: scale(1.05);
+            border-color: var(--primary-hover);
+            box-shadow: 0 8px 25px rgba(255, 64, 129, 0.5);
+            transform: scale(1.1) translateY(-2px);
         }
 
         /* Food Grid */
         .food-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 25px 0;
+            gap: 18px;
+            margin: 30px 0;
         }
 
         .food-option {
-            border: 3px solid var(--bg-pink);
-            padding: 20px 10px;
+            border: 3px solid var(--accent);
+            padding: 25px 15px;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 1.3rem;
-            font-weight: 600;
-            transition: all 0.25s ease;
-            background: white;
+            font-size: 1.4rem;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: linear-gradient(135deg, #fff5f7, #fff);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .food-option::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 64, 129, 0.1), rgba(232, 67, 147, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
         .food-option:hover {
-            transform: translateY(-3px);
-            border-color: var(--accent);
-            background-color: var(--light-pink);
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            background: linear-gradient(135deg, var(--light-pink), var(--bg-pink));
+            box-shadow: 0 12px 30px rgba(255, 64, 129, 0.2);
+        }
+
+        .food-option:hover::before {
+            opacity: 1;
         }
 
         .food-option.selected {
             background: linear-gradient(135deg, var(--accent), var(--primary));
             color: white;
             border-color: var(--primary-hover);
-            transform: scale(1.05);
-            box-shadow: 0 8px 20px rgba(255, 64, 129, 0.3);
+            transform: scale(1.08);
+            box-shadow: 0 15px 40px rgba(255, 64, 129, 0.4);
         }
 
-        /* Final Summary Layout */
+        /* Summary */
         .summary {
             font-size: 1.35rem;
             margin: 25px 0;
-            line-height: 1.7;
-            background: linear-gradient(185deg, #fff5f7, var(--bg-pink));
-            padding: 25px;
-            border-radius: 20px;
-            border-left: 5px solid var(--primary);
+            line-height: 2;
+            background: linear-gradient(135deg, #fff5f7, var(--light-pink));
+            padding: 30px;
+            border-radius: 25px;
+            border-left: 6px solid var(--primary);
             text-align: left;
+            box-shadow: 0 8px 25px rgba(255, 64, 129, 0.15);
+            border-top: 3px solid var(--accent);
         }
 
-        .summary span { color: var(--primary-hover); }
+        .summary span { 
+            color: var(--primary-hover);
+            font-weight: 700;
+        }
 
         .quote {
             font-style: italic;
-            color: var(--primary-hover);
-            font-weight: 600;
-            font-size: 1.15rem;
-            margin-top: 20px;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-top: 25px;
+            text-shadow: 0 2px 4px rgba(255, 64, 129, 0.2);
+        }
+
+        /* Countdown Timer */
+        .countdown-container {
+            background: linear-gradient(135deg, #ffb6d9 0%, #ff80ab 50%, #ff6ba6 100%);
+            padding: 30px;
+            border-radius: 25px;
+            margin: 30px 0;
+            box-shadow: 0 12px 40px rgba(255, 64, 129, 0.3);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .countdown-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .countdown-title {
+            font-size: 1.25rem;
+            color: white;
+            font-weight: 700;
+            margin-bottom: 18px;
+            opacity: 1;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            letter-spacing: 2px;
+        }
+
+        .countdown-display {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .countdown-unit {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 18px 12px;
+            border-radius: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .countdown-unit:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .countdown-number {
+            font-size: 2.2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--rose));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .countdown-label {
+            font-size: 0.8rem;
+            color: var(--text-color);
+            font-weight: 700;
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
         }
 
         /* Canvas */
@@ -321,70 +580,52 @@
             position: fixed;
             bottom: 15px;
             right: 15px;
-            font-size: 0.85rem;
-            color: rgba(216, 27, 96, 0.6);
-            font-weight: 500;
+            font-size: 0.95rem;
+            color: rgba(216, 27, 96, 0.7);
+            font-weight: 700;
             z-index: 1;
-            transition: color 0.3s;
+            transition: all 0.3s;
+            text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
+            cursor: pointer;
         }
 
         .footer-credit:hover {
             color: rgba(216, 27, 96, 1);
+            transform: scale(1.1);
+            text-shadow: 0 0 15px rgba(255, 64, 129, 0.5);
         }
 
-        /* Countdown Timer */
-        .countdown-container {
-            background: linear-gradient(135deg, #ffb6d9, #ff80ab);
-            padding: 25px;
-            border-radius: 20px;
-            margin: 25px 0;
-            box-shadow: 0 8px 25px rgba(255, 64, 129, 0.25);
-            text-align: center;
-        }
-
-        .countdown-title {
-            font-size: 1.1rem;
+        /* Sound Toggle */
+        .sound-toggle {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            border: none;
             color: white;
-            font-weight: 600;
-            margin-bottom: 15px;
-            opacity: 0.95;
-        }
-
-        .countdown-display {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-top: 15px;
-        }
-
-        .countdown-unit {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 15px 10px;
-            border-radius: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 100;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 6px 20px rgba(255, 64, 129, 0.3);
+            transition: all 0.3s;
         }
 
-        .countdown-number {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary);
-            line-height: 1;
+        .sound-toggle:hover {
+            transform: scale(1.15) rotate(15deg);
+            box-shadow: 0 8px 30px rgba(255, 64, 129, 0.5);
         }
 
-        .countdown-label {
-            font-size: 0.75rem;
-            color: var(--text-color);
-            font-weight: 600;
-            margin-top: 5px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .sound-toggle.muted {
+            background: linear-gradient(135deg, #999, #666);
         }
 
-        /* --- BULLETPROOF HEART TRANSITION --- */
+        /* Heart Transition */
         #heart-transition-container {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
@@ -398,53 +639,85 @@
 
         .pure-heart {
             position: relative;
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             background-color: var(--primary);
             transform: rotate(-45deg) scale(0);
             transform-origin: center;
+            filter: drop-shadow(0 0 15px rgba(255, 64, 129, 0.6));
         }
 
         .pure-heart::before, .pure-heart::after {
             content: "";
             position: absolute;
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             background-color: var(--primary);
             border-radius: 50%;
         }
 
-        .pure-heart::before { top: -25px; left: 0; }
-        .pure-heart::after { top: 0; left: 25px; }
+        .pure-heart::before { top: -30px; left: 0; }
+        .pure-heart::after { top: 0; left: 30px; }
 
         .heart-explode { visibility: visible !important; }
         .heart-explode .pure-heart {
-            animation: explodeHeartAnim 1.5s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+            animation: explodeHeartAnim 1.8s cubic-bezier(0.77, 0, 0.175, 1) forwards;
         }
 
-        @keyframes explodeHeartAnim {
-            0% { transform: rotate(-45deg) scale(0); }
-            45%, 55% { transform: rotate(-45deg) scale(60); } 
-            100% { transform: rotate(-45deg) scale(0); }
+        /* Love Letter */
+        .love-letter {
+            margin: 30px 0;
+            background: linear-gradient(135deg, #fff9f0, #fff5f7);
+            padding: 30px;
+            border-radius: 15px;
+            border: 3px dashed var(--accent);
+            position: relative;
+            animation: letterFloat 3s ease-in-out infinite;
         }
 
+        .love-letter::before {
+            content: '💌';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+        }
+
+        @keyframes letterFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .love-letter-content {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            line-height: 1.8;
+            font-style: italic;
+        }
+
+        /* Animations */
         @keyframes popIn {
-            0% { transform: scale(0.6); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
+            0% { transform: scale(0.6) rotateY(20deg); opacity: 0; }
+            100% { transform: scale(1) rotateY(0); opacity: 1; }
         }
+
         @keyframes popText {
-            0% { transform: scale(0.8) translateY(10px); opacity: 0; }
+            0% { transform: scale(0.5) translateY(15px); opacity: 0; }
             100% { transform: scale(1) translateY(0); opacity: 1; }
         }
-        @keyframes beat {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.15); }
-        }
+
         @keyframes floatUp {
             0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
             10% { opacity: 1; }
             90% { opacity: 1; }
-            100% { transform: translateY(-105vh) translateX(50px) rotate(360deg); opacity: 0; }
+            100% { transform: translateY(-110vh) translateX(80px) rotate(360deg); opacity: 0; }
+        }
+
+        @keyframes explodeHeartAnim {
+            0% { transform: rotate(-45deg) scale(0); }
+            40%, 60% { transform: rotate(-45deg) scale(70); } 
+            100% { transform: rotate(-45deg) scale(0); }
         }
     </style>
 </head>
@@ -456,16 +729,26 @@
         <div class="pure-heart"></div>
     </div>
 
+    <!-- Sound Toggle -->
+    <button class="sound-toggle" id="soundToggle" title="Toggle Sound Effects">🔊</button>
+
     <!-- SCREEN 1: Proposal -->
     <div id="screen1" class="screen active">
         <div class="hearts-banner pulse">💌</div>
         <h1>Will you go on a date with me?</h1>
         
-        <!-- Pleading Text Container -->
         <div id="pleading-text" class="pleading-text"></div>
 
-        <div style="min-height: 80px; position: relative; margin-top: 10px;">
-            <button id="yes-btn" class="btn pulse" onclick="nextScreen('screen2')">Yes! 😍</button>
+        <div class="love-letter">
+            <div class="love-letter-content">
+                I couldn't stop thinking about you... 🥰<br>
+                Life feels more colorful with you around.<br>
+                Would you make me the happiest by saying YES? ✨
+            </div>
+        </div>
+
+        <div style="min-height: 100px; position: relative; margin-top: 20px;">
+            <button id="yes-btn" class="btn pulse" onclick="triggerYes()">Yes! 😍</button>
             <button id="no-btn" class="btn">No 😢</button>
         </div>
     </div>
@@ -475,7 +758,6 @@
         <div class="hearts-banner">📅✨</div>
         <h1>So... when are you free?</h1>
         
-        <!-- Custom Calendar UI -->
         <div class="custom-picker-container">
             <div class="calendar-header">
                 <div class="calendar-nav" onclick="changeMonth(-1)">&lt;</div>
@@ -488,9 +770,8 @@
             <div class="calendar-grid" id="calendar-grid"></div>
         </div>
 
-        <h3 style="margin-top: 15px; margin-bottom: 5px; font-size: 1.1rem;">Pick a Time:</h3>
+        <h3 style="margin-top: 20px; margin-bottom: 10px; font-size: 1.15rem; color: var(--primary); font-weight: 700;">⏰ Pick a Time:</h3>
         
-        <!-- Custom Time UI -->
         <div class="time-picker-container" id="time-container">
             <div class="time-pill" onclick="selectTime(this, '1:00 PM')">1:00 PM</div>
             <div class="time-pill" onclick="selectTime(this, '5:00 PM')">5:00 PM</div>
@@ -500,7 +781,7 @@
             <div class="time-pill" onclick="selectTime(this, '9:00 PM')">9:00 PM</div>
         </div>
         
-        <button id="dateTimeBtn" class="btn" style="margin-top: 25px;" disabled onclick="nextScreen('screen3')">Set the date</button>
+        <button id="dateTimeBtn" class="btn" style="margin-top: 30px;" disabled onclick="nextScreen('screen3')">Set the date 💝</button>
     </div>
 
     <!-- SCREEN 3: Food Selection -->
@@ -513,21 +794,21 @@
             <div class="food-option" onclick="selectFood(this, 'Pasta')">Pasta 🍝</div>
             <div class="food-option" onclick="selectFood(this, 'Vietnamese Food')">Vietnamese 🍜</div>
         </div>
-        <button id="foodBtn" class="btn" disabled onclick="triggerHeartTransition()">Next ✨</button>
+        <button id="foodBtn" class="btn" disabled onclick="triggerHeartTransition()">Confirm 💕</button>
     </div>
 
     <!-- SCREEN 4: Conclusion -->
     <div id="screen4" class="screen">
         <div class="hearts-banner pulse">💖🎉💞</div>
-        <h1>It's an Official Date!</h1>
+        <h1>It's an Official Date! 🎊</h1>
+        
         <div class="summary">
             🎈 <strong>Yay!</strong> Can't wait!<br>
-            🍽️ We are going for: <strong><span id="finalFood"></span></strong> <br>
-            📅 Marked on: <strong><span id="finalDate"></span></strong> <br>
-            ⏰ Scheduled at: <strong><span id="finalTime"></span></strong>
+            🍽️ Cuisine: <strong><span id="finalFood"></span></strong> <br>
+            📅 Date: <strong><span id="finalDate"></span></strong> <br>
+            ⏰ Time: <strong><span id="finalTime"></span></strong>
         </div>
 
-        <!-- Countdown Timer -->
         <div class="countdown-container">
             <div class="countdown-title">⏳ Time Until Our Date ⏳</div>
             <div class="countdown-display">
@@ -550,7 +831,15 @@
             </div>
         </div>
 
-        <p class="quote">"Counting down the seconds until I see you! 🥰✨"</p>
+        <p class="quote">"Counting down every second until I see that beautiful smile! 🥰✨"</p>
+
+        <div class="love-letter">
+            <div class="love-letter-content">
+                This is going to be amazing! 💫<br>
+                Can't wait to spend the day with you! 🌹<br>
+                You're going to absolutely love it! 💖
+            </div>
+        </div>
     </div>
 
     <!-- Footer Credit -->
@@ -561,24 +850,98 @@
         let chosenFood = "";
         let finalSelectedDate = null;
         let finalSelectedTime = "";
+        let soundEnabled = true;
 
-        // Ambient Hearts
+        // Sound effects (using Web Audio API for pure tone generation)
+        function playSound(type) {
+            if (!soundEnabled) return;
+            
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            oscillator.connect(gain);
+            gain.connect(audioContext.destination);
+
+            switch(type) {
+                case 'click':
+                    oscillator.frequency.value = 800;
+                    gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.1);
+                    break;
+                case 'success':
+                    oscillator.frequency.value = 1200;
+                    gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                    break;
+                case 'heart':
+                    oscillator.frequency.value = 600;
+                    gain.gain.setValueAtTime(0.2, audioContext.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.2);
+            }
+        }
+
+        // Sound toggle
+        document.getElementById('soundToggle').addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            document.getElementById('soundToggle').classList.toggle('muted');
+            playSound('click');
+        });
+
+        // Rose petal animation
+        function createRosePetals() {
+            setInterval(() => {
+                const petal = document.createElement('div');
+                petal.classList.add('rose-petal');
+                petal.textContent = ['🌹', '🌺', '🌸', '💐'][Math.floor(Math.random() * 4)];
+                petal.style.left = Math.random() * 100 + 'vw';
+                petal.style.animationDuration = (Math.random() * 4 + 6) + 's';
+                document.body.appendChild(petal);
+                setTimeout(() => { petal.remove(); }, 10000);
+            }, 1500);
+        }
+        createRosePetals();
+
+        // Ambient floating hearts
         function createAmbientHearts() {
-            const heartSymbols = ['❤️', '💖', '💝', '💕', '💗'];
+            const heartSymbols = ['❤️', '💖', '💝', '💕', '💗', '🎀', '✨'];
             setInterval(() => {
                 const heart = document.createElement('div');
                 heart.classList.add('bg-heart');
                 heart.innerText = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
                 heart.style.left = Math.random() * 100 + 'vw';
-                heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
-                heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+                heart.style.animationDuration = (Math.random() * 4 + 6) + 's';
+                heart.style.fontSize = (Math.random() * 25 + 15) + 'px';
                 document.body.appendChild(heart);
-                setTimeout(() => { heart.remove(); }, 7000);
-            }, 600);
+                setTimeout(() => { heart.remove(); }, 10000);
+            }, 800);
         }
         createAmbientHearts();
 
-        // --- NEW TELEPORTING "NO" BUTTON & QUOTES LOGIC ---
+        // Sparkle effect on click
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('btn')) {
+                for (let i = 0; i < 8; i++) {
+                    const sparkle = document.createElement('div');
+                    sparkle.classList.add('sparkle');
+                    sparkle.style.left = e.clientX + 'px';
+                    sparkle.style.top = e.clientY + 'px';
+                    const angle = (i / 8) * Math.PI * 2;
+                    const distance = 80;
+                    sparkle.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+                    sparkle.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+                    document.body.appendChild(sparkle);
+                    setTimeout(() => sparkle.remove(), 1500);
+                }
+            }
+        });
+
+        // No button escape logic
         const noBtn = document.getElementById('no-btn');
         const pleadingText = document.getElementById('pleading-text');
         
@@ -596,11 +959,11 @@
         ];
 
         function handleNoHover() {
+            playSound('click');
             if (noBtn.parentNode !== document.body) {
                 document.body.appendChild(noBtn);
             }
 
-            // 1. INSTANT TELEPORT
             noBtn.style.position = 'fixed';
             const padding = 20;
             const maxX = window.innerWidth - noBtn.offsetWidth - padding;
@@ -609,13 +972,11 @@
             noBtn.style.left = Math.max(padding, Math.floor(Math.random() * maxX)) + 'px';
             noBtn.style.top = Math.max(padding, Math.floor(Math.random() * maxY)) + 'px';
 
-            // 2. SHOW CUTE QUOTE
             const randomQuote = cuteQuotes[Math.floor(Math.random() * cuteQuotes.length)];
             pleadingText.innerText = randomQuote;
             
-            // Re-trigger the CSS animation so it pops every time
             pleadingText.classList.remove('pop-text-anim');
-            void pleadingText.offsetWidth; // forces browser to redraw
+            void pleadingText.offsetWidth;
             pleadingText.classList.add('pop-text-anim');
         }
 
@@ -623,9 +984,9 @@
         noBtn.addEventListener('touchstart', handleNoHover);
         noBtn.addEventListener('click', (e) => { e.preventDefault(); handleNoHover(); });
 
-        // --- NAVIGATION LOGIC WITH FIX FOR FLOATING BUTTON ---
+        // Navigation
         function nextScreen(screenId) {
-            // FIX: If we are leaving the first screen, completely hide the No button!
+            playSound('success');
             if (screenId !== 'screen1') {
                 noBtn.style.display = 'none';
             }
@@ -634,7 +995,7 @@
             document.getElementById(screenId).classList.add('active');
         }
 
-        // --- CUSTOM CALENDAR LOGIC ---
+        // Calendar logic
         const today = new Date();
         today.setHours(0,0,0,0);
         let currentMonth = today.getMonth();
@@ -681,6 +1042,7 @@
         }
 
         function selectDate(element, dateObj) {
+            playSound('click');
             document.querySelectorAll('.day-cell').forEach(el => el.classList.remove('selected'));
             element.classList.add('selected');
             finalSelectedDate = dateObj;
@@ -688,6 +1050,7 @@
         }
 
         function selectTime(element, timeStr) {
+            playSound('click');
             document.querySelectorAll('.time-pill').forEach(el => el.classList.remove('selected'));
             element.classList.add('selected');
             finalSelectedTime = timeStr;
@@ -700,17 +1063,17 @@
 
         renderCalendar(currentMonth, currentYear);
 
-        // --- FOOD LOGIC ---
+        // Food selection
         function selectFood(element, foodName) {
+            playSound('click');
             document.querySelectorAll('.food-option').forEach(opt => opt.classList.remove('selected'));
             element.classList.add('selected');
             chosenFood = foodName;
             document.getElementById('foodBtn').disabled = false;
         }
 
-        // --- COUNTDOWN TIMER LOGIC ---
+        // Countdown timer
         function startCountdown() {
-            // Create a date object combining the selected date and time
             const [time, period] = finalSelectedTime.match(/(\d+:\d+)\s(AM|PM)/).slice(1);
             const [hour, minute] = time.split(':');
             let dateHour = parseInt(hour);
@@ -725,7 +1088,6 @@
                 const distance = targetDate.getTime() - now;
 
                 if (distance < 0) {
-                    // Date has passed
                     document.getElementById('days').innerText = '0';
                     document.getElementById('hours').innerText = '0';
                     document.getElementById('minutes').innerText = '0';
@@ -744,28 +1106,31 @@
                 document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
             }
 
-            // Update immediately
             updateCountdown();
-            
-            // Update every second
             setInterval(updateCountdown, 1000);
         }
 
-        // --- HEART TRANSITION LOGIC ---
+        // Heart transition
         function triggerHeartTransition() {
+            playSound('heart');
             const container = document.getElementById('heart-transition-container');
             container.classList.add('heart-explode');
             
             setTimeout(() => {
                 processSummaryData();
                 nextScreen('screen4');
-                startCountdown(); // Start the countdown timer
+                startCountdown();
             }, 750);
 
             setTimeout(() => {
                 container.classList.remove('heart-explode');
                 startCelebrationConfetti();
             }, 1500);
+        }
+
+        function triggerYes() {
+            playSound('success');
+            setTimeout(() => nextScreen('screen2'), 300);
         }
 
         function processSummaryData() {
@@ -777,7 +1142,7 @@
             document.getElementById('finalFood').textContent = chosenFood;
         }
 
-        // --- CONFETTI ENGINE ---
+        // Enhanced confetti
         function startCelebrationConfetti() {
             const canvas = document.getElementById('celebration-canvas');
             const ctx = canvas.getContext('2d');
@@ -787,28 +1152,28 @@
 
             const particles = [];
             const colors = ['#ff4081', '#ff80ab', '#ffb6c1', '#ff1744', '#fafafa', '#ffeb3b'];
-            const shapes = ['circle', 'heart', 'star'];
+            const shapes = ['circle', 'heart', 'star', 'rose'];
 
             class Particle {
                 constructor() {
                     this.x = canvas.width / 2;
                     this.y = canvas.height + 20; 
-                    this.radius = Math.random() * 8 + 4;
-                    this.speedX = Math.random() * 12 - 6;
-                    this.speedY = Math.random() * -15 - 10;
-                    this.gravity = 0.25;
+                    this.radius = Math.random() * 10 + 5;
+                    this.speedX = Math.random() * 14 - 7;
+                    this.speedY = Math.random() * -18 - 12;
+                    this.gravity = 0.3;
                     this.color = colors[Math.floor(Math.random() * colors.length)];
                     this.shape = shapes[Math.floor(Math.random() * shapes.length)];
                     this.opacity = 1;
                     this.rotation = Math.random() * 360;
-                    this.rotationSpeed = Math.random() * 4 - 2;
+                    this.rotationSpeed = Math.random() * 6 - 3;
                 }
                 update() {
                     this.speedY += this.gravity;
                     this.x += this.speedX;
                     this.y += this.speedY;
                     this.rotation += this.rotationSpeed;
-                    if (this.speedY > 0) this.opacity -= 0.012; 
+                    if (this.speedY > 0) this.opacity -= 0.01; 
                 }
                 draw() {
                     ctx.save();
@@ -828,6 +1193,9 @@
                         ctx.bezierCurveTo(r/2, -r, r, -r/3, 0, r);
                         ctx.bezierCurveTo(-r, -r/3, -r/2, -r, 0, -r/2);
                         ctx.fill();
+                    } else if (this.shape === 'rose') {
+                        ctx.font = `${this.radius * 2}px Arial`;
+                        ctx.fillText('🌹', -this.radius, this.radius);
                     } else { 
                         ctx.beginPath();
                         for (let i = 0; i < 5; i++) {
@@ -841,8 +1209,8 @@
                 }
             }
 
-            for (let i = 0; i < 150; i++) {
-                setTimeout(() => { particles.push(new Particle()); }, Math.random() * 400);
+            for (let i = 0; i < 200; i++) {
+                setTimeout(() => { particles.push(new Particle()); }, Math.random() * 500);
             }
 
             function animate() {
