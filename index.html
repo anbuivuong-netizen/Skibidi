@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will you go on a date with me? 💖</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&display=swap');
+
+        :root {
+            --primary: #ff4081;
+            --primary-hover: #f50057;
+            --bg-pink: #ffe6eb;
+            --accent: #ff80ab;
+            --text-color: #d81b60;
+            --light-pink: #fff0f3;
+            --grey: #dcdde1;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Fredoka', sans-serif;
+            background-color: var(--bg-pink);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Ambient floating hearts */
+        .bg-heart {
+            position: absolute;
+            color: rgba(255, 128, 171, 0.25);
+            font-size: 20px;
+            pointer-events: none;
+            animation: floatUp 6s linear infinite;
+            bottom: -50px;
+        }
+
+        .screen {
+            display: none;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(216, 27, 96, 0.15);
+            max-width: 480px;
+            width: 90%;
+            z-index: 5;
+            backdrop-filter: blur(5px);
+            border: 4px solid #fff;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Custom Scrollbar for smaller screens */
+        .screen::-webkit-scrollbar { width: 6px; }
+        .screen::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+        .screen.active {
+            display: block;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 0px rgba(255,255,255,0.8);
+            line-height: 1.2;
+        }
+
+        /* Cute popping text when they hover NO */
+        .pleading-text {
+            font-size: 1.3rem;
+            color: var(--primary);
+            font-weight: 600;
+            min-height: 35px;
+            margin-bottom: 15px;
+            opacity: 0;
+            font-style: italic;
+        }
+
+        .pop-text-anim {
+            animation: popText 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .hearts-banner {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        .pulse { animation: beat 0.8s infinite alternate cubic-bezier(0.25, 0.8, 0.25, 1); }
+
+        /* Buttons */
+        .btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 16px 36px;
+            font-size: 1.25rem;
+            font-family: inherit;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 6px 20px rgba(255, 128, 171, 0.4);
+            outline: none;
+        }
+
+        .btn:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+            transform: scale(1.08) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 0, 87, 0.5);
+        }
+
+        .btn:active:not(:disabled) { transform: scale(0.98) translateY(0); }
+
+        .btn:disabled {
+            background-color: var(--grey);
+            color: #a1a2a6;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        #yes-btn { background-color: var(--primary); z-index: 10; position: relative;}
+
+        #no-btn {
+            background-color: #fff;
+            color: var(--text-color);
+            border: 2px solid var(--accent);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            z-index: 9999;
+            transition: transform 0.2s, background-color 0.2s; 
+        }
+
+        /* --- CUSTOM CALENDAR UI --- */
+        .custom-picker-container {
+            margin: 20px 0;
+            background: #fff;
+            border: 3px solid var(--bg-pink);
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--primary-hover);
+        }
+
+        .calendar-nav {
+            cursor: pointer;
+            background: var(--bg-pink);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: 0.2s;
+            user-select: none;
+        }
+        .calendar-nav:hover { background: var(--accent); color: white; }
+
+        .days-of-week {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .day-cell {
+            aspect-ratio: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .day-cell:hover:not(.disabled) {
+            background: var(--bg-pink);
+            border-color: var(--accent);
+        }
+
+        .day-cell.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 10px rgba(255, 64, 129, 0.4);
+            transform: scale(1.1);
+        }
+
+        .day-cell.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+            background: transparent;
+        }
+
+        /* --- CUSTOM TIME PICKER UI --- */
+        .time-picker-container {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .time-pill {
+            background: var(--bg-pink);
+            color: var(--text-color);
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .time-pill:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .time-pill.selected {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(255, 64, 129, 0.4);
+            transform: scale(1.05);
+        }
+
+        /* Food Grid */
+        .food-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .food-option {
+            border: 3px solid var(--bg-pink);
+            padding: 20px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1.3rem;
+            font-weight: 600;
+            transition: all 0.25s ease;
+            background: white;
+        }
+
+        .food-option:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            background-color: var(--light-pink);
+        }
+
+        .food-option.selected {
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            color: white;
+            border-color: var(--primary-hover);
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 64, 129, 0.3);
+        }
+
+        /* Final Summary Layout */
+        .summary {
+            font-size: 1.35rem;
+            margin: 25px 0;
+            line-height: 1.7;
+            background: linear-gradient(185deg, #fff5f7, var(--bg-pink));
+            padding: 25px;
+            border-radius: 20px;
+            border-left: 5px solid var(--primary);
+            text-align: left;
+        }
+
+        .summary span { color: var(--primary-hover); }
+
+        .quote {
+            font-style: italic;
+            color: var(--primary-hover);
+            font-weight: 600;
+            font-size: 1.15rem;
+            margin-top: 20px;
+        }
+
+        /* Canvas */
+        #celebration-canvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 20;
+        }
+
+        /* Footer Credit */
+        .footer-credit {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            font-size: 0.85rem;
+            color: rgba(216, 27, 96, 0.6);
+            font-weight: 500;
+            z-index: 1;
+            transition: color 0.3s;
+        }
+
+        .footer-credit:hover {
+            color: rgba(216, 27, 96, 1);
+        }
+
+        /* Countdown Timer */
+        .countdown-container {
+            background: linear-gradient(135deg, #ffb6d9, #ff80ab);
+            padding: 25px;
+            border-radius: 20px;
+            margin: 25px 0;
+            box-shadow: 0 8px 25px rgba(255, 64, 129, 0.25);
+            text-align: center;
+        }
+
+        .countdown-title {
+            font-size: 1.1rem;
+            color: white;
+            font-weight: 600;
+            margin-bottom: 15px;
+            opacity: 0.95;
+        }
+
+        .countdown-display {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .countdown-unit {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 10px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .countdown-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .countdown-label {
+            font-size: 0.75rem;
+            color: var(--text-color);
+            font-weight: 600;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- BULLETPROOF HEART TRANSITION --- */
+        #heart-transition-container {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            visibility: hidden;
+        }
+
+        .pure-heart {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary);
+            transform: rotate(-45deg) scale(0);
+            transform-origin: center;
+        }
+
+        .pure-heart::before, .pure-heart::after {
+            content: "";
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary);
+            border-radius: 50%;
+        }
+
+        .pure-heart::before { top: -25px; left: 0; }
+        .pure-heart::after { top: 0; left: 25px; }
+
+        .heart-explode { visibility: visible !important; }
+        .heart-explode .pure-heart {
+            animation: explodeHeartAnim 1.5s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+        }
+
+        @keyframes explodeHeartAnim {
+            0% { transform: rotate(-45deg) scale(0); }
+            45%, 55% { transform: rotate(-45deg) scale(60); } 
+            100% { transform: rotate(-45deg) scale(0); }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.6); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes popText {
+            0% { transform: scale(0.8) translateY(10px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        @keyframes beat {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.15); }
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-105vh) translateX(50px) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="celebration-canvas"></canvas>
+
+    <div id="heart-transition-container">
+        <div class="pure-heart"></div>
+    </div>
+
+    <!-- SCREEN 1: Proposal -->
+    <div id="screen1" class="screen active">
+        <div class="hearts-banner pulse">💌</div>
+        <h1>Will you go on a date with me?</h1>
+        
+        <!-- Pleading Text Container -->
+        <div id="pleading-text" class="pleading-text"></div>
+
+        <div style="min-height: 80px; position: relative; margin-top: 10px;">
+            <button id="yes-btn" class="btn pulse" onclick="nextScreen('screen2')">Yes! 😍</button>
+            <button id="no-btn" class="btn">No 😢</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 2: Custom Date & Time Picker -->
+    <div id="screen2" class="screen">
+        <div class="hearts-banner">📅✨</div>
+        <h1>So... when are you free?</h1>
+        
+        <!-- Custom Calendar UI -->
+        <div class="custom-picker-container">
+            <div class="calendar-header">
+                <div class="calendar-nav" onclick="changeMonth(-1)">&lt;</div>
+                <div id="month-year-display">Month Year</div>
+                <div class="calendar-nav" onclick="changeMonth(1)">&gt;</div>
+            </div>
+            <div class="days-of-week">
+                <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+            </div>
+            <div class="calendar-grid" id="calendar-grid"></div>
+        </div>
+
+        <h3 style="margin-top: 15px; margin-bottom: 5px; font-size: 1.1rem;">Pick a Time:</h3>
+        
+        <!-- Custom Time UI -->
+        <div class="time-picker-container" id="time-container">
+            <div class="time-pill" onclick="selectTime(this, '1:00 PM')">1:00 PM</div>
+            <div class="time-pill" onclick="selectTime(this, '5:00 PM')">5:00 PM</div>
+            <div class="time-pill" onclick="selectTime(this, '6:30 PM')">6:30 PM</div>
+            <div class="time-pill" onclick="selectTime(this, '7:30 PM')">7:30 PM</div>
+            <div class="time-pill" onclick="selectTime(this, '8:00 PM')">8:00 PM</div>
+            <div class="time-pill" onclick="selectTime(this, '9:00 PM')">9:00 PM</div>
+        </div>
+        
+        <button id="dateTimeBtn" class="btn" style="margin-top: 25px;" disabled onclick="nextScreen('screen3')">Set the date</button>
+    </div>
+
+    <!-- SCREEN 3: Food Selection -->
+    <div id="screen3" class="screen">
+        <div class="hearts-banner">😋🍴</div>
+        <h1>What are we feeling?</h1>
+        <div class="food-grid">
+            <div class="food-option" onclick="selectFood(this, 'Pizza')">Pizza 🍕</div>
+            <div class="food-option" onclick="selectFood(this, 'Sushi')">Sushi 🍣</div>
+            <div class="food-option" onclick="selectFood(this, 'Pasta')">Pasta 🍝</div>
+            <div class="food-option" onclick="selectFood(this, 'Vietnamese Food')">Vietnamese 🍜</div>
+        </div>
+        <button id="foodBtn" class="btn" disabled onclick="triggerHeartTransition()">Next ✨</button>
+    </div>
+
+    <!-- SCREEN 4: Conclusion -->
+    <div id="screen4" class="screen">
+        <div class="hearts-banner pulse">💖🎉💞</div>
+        <h1>It's an Official Date!</h1>
+        <div class="summary">
+            🎈 <strong>Yay!</strong> Can't wait!<br>
+            🍽️ We are going for: <strong><span id="finalFood"></span></strong> <br>
+            📅 Marked on: <strong><span id="finalDate"></span></strong> <br>
+            ⏰ Scheduled at: <strong><span id="finalTime"></span></strong>
+        </div>
+
+        <!-- Countdown Timer -->
+        <div class="countdown-container">
+            <div class="countdown-title">⏳ Time Until Our Date ⏳</div>
+            <div class="countdown-display">
+                <div class="countdown-unit">
+                    <div class="countdown-number" id="days">0</div>
+                    <div class="countdown-label">Days</div>
+                </div>
+                <div class="countdown-unit">
+                    <div class="countdown-number" id="hours">0</div>
+                    <div class="countdown-label">Hours</div>
+                </div>
+                <div class="countdown-unit">
+                    <div class="countdown-number" id="minutes">0</div>
+                    <div class="countdown-label">Minutes</div>
+                </div>
+                <div class="countdown-unit">
+                    <div class="countdown-number" id="seconds">0</div>
+                    <div class="countdown-label">Seconds</div>
+                </div>
+            </div>
+        </div>
+
+        <p class="quote">"Counting down the seconds until I see you! 🥰✨"</p>
+    </div>
+
+    <!-- Footer Credit -->
+    <div class="footer-credit">Coded by AnBui ✨</div>
+
+    <script>
+        // State variables
+        let chosenFood = "";
+        let finalSelectedDate = null;
+        let finalSelectedTime = "";
+
+        // Ambient Hearts
+        function createAmbientHearts() {
+            const heartSymbols = ['❤️', '💖', '💝', '💕', '💗'];
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.classList.add('bg-heart');
+                heart.innerText = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+                document.body.appendChild(heart);
+                setTimeout(() => { heart.remove(); }, 7000);
+            }, 600);
+        }
+        createAmbientHearts();
+
+        // --- NEW TELEPORTING "NO" BUTTON & QUOTES LOGIC ---
+        const noBtn = document.getElementById('no-btn');
+        const pleadingText = document.getElementById('pleading-text');
+        
+        const cuteQuotes = [
+            "Please? 🥺",
+            "Give me a chance! ✨",
+            "Don't break my heart! 💔",
+            "I'll buy you your favorite food! 🍕",
+            "Are you absolutely sure? 😢",
+            "But we'd be so cute together! 🥰",
+            "Think about it again! 🤔",
+            "Just click Yes already! 💖",
+            "You're making me sad... 🌧️",
+            "I'm clicking Yes for you! 😠 (jk)"
+        ];
+
+        function handleNoHover() {
+            if (noBtn.parentNode !== document.body) {
+                document.body.appendChild(noBtn);
+            }
+
+            // 1. INSTANT TELEPORT
+            noBtn.style.position = 'fixed';
+            const padding = 20;
+            const maxX = window.innerWidth - noBtn.offsetWidth - padding;
+            const maxY = window.innerHeight - noBtn.offsetHeight - padding;
+            
+            noBtn.style.left = Math.max(padding, Math.floor(Math.random() * maxX)) + 'px';
+            noBtn.style.top = Math.max(padding, Math.floor(Math.random() * maxY)) + 'px';
+
+            // 2. SHOW CUTE QUOTE
+            const randomQuote = cuteQuotes[Math.floor(Math.random() * cuteQuotes.length)];
+            pleadingText.innerText = randomQuote;
+            
+            // Re-trigger the CSS animation so it pops every time
+            pleadingText.classList.remove('pop-text-anim');
+            void pleadingText.offsetWidth; // forces browser to redraw
+            pleadingText.classList.add('pop-text-anim');
+        }
+
+        noBtn.addEventListener('mouseover', handleNoHover);
+        noBtn.addEventListener('touchstart', handleNoHover);
+        noBtn.addEventListener('click', (e) => { e.preventDefault(); handleNoHover(); });
+
+        // --- NAVIGATION LOGIC WITH FIX FOR FLOATING BUTTON ---
+        function nextScreen(screenId) {
+            // FIX: If we are leaving the first screen, completely hide the No button!
+            if (screenId !== 'screen1') {
+                noBtn.style.display = 'none';
+            }
+
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // --- CUSTOM CALENDAR LOGIC ---
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        let currentMonth = today.getMonth();
+        let currentYear = today.getFullYear();
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        function renderCalendar(month, year) {
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = "";
+            document.getElementById('month-year-display').innerText = `${monthNames[month]} ${year}`;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                let emptyCell = document.createElement('div');
+                grid.appendChild(emptyCell);
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                let cell = document.createElement('div');
+                cell.classList.add('day-cell');
+                cell.innerText = i;
+                let cellDate = new Date(year, month, i);
+                
+                if (cellDate < today) {
+                    cell.classList.add('disabled');
+                } else {
+                    cell.onclick = () => selectDate(cell, cellDate);
+                }
+
+                if (finalSelectedDate && cellDate.getTime() === finalSelectedDate.getTime()) {
+                    cell.classList.add('selected');
+                }
+                grid.appendChild(cell);
+            }
+        }
+
+        function changeMonth(dir) {
+            currentMonth += dir;
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            renderCalendar(currentMonth, currentYear);
+        }
+
+        function selectDate(element, dateObj) {
+            document.querySelectorAll('.day-cell').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            finalSelectedDate = dateObj;
+            validateDateTime();
+        }
+
+        function selectTime(element, timeStr) {
+            document.querySelectorAll('.time-pill').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            finalSelectedTime = timeStr;
+            validateDateTime();
+        }
+
+        function validateDateTime() {
+            document.getElementById('dateTimeBtn').disabled = !(finalSelectedDate && finalSelectedTime);
+        }
+
+        renderCalendar(currentMonth, currentYear);
+
+        // --- FOOD LOGIC ---
+        function selectFood(element, foodName) {
+            document.querySelectorAll('.food-option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            chosenFood = foodName;
+            document.getElementById('foodBtn').disabled = false;
+        }
+
+        // --- COUNTDOWN TIMER LOGIC ---
+        function startCountdown() {
+            // Create a date object combining the selected date and time
+            const [time, period] = finalSelectedTime.match(/(\d+:\d+)\s(AM|PM)/).slice(1);
+            const [hour, minute] = time.split(':');
+            let dateHour = parseInt(hour);
+            if (period === 'PM' && dateHour !== 12) dateHour += 12;
+            if (period === 'AM' && dateHour === 12) dateHour = 0;
+
+            const targetDate = new Date(finalSelectedDate);
+            targetDate.setHours(dateHour, minute, 0, 0);
+
+            function updateCountdown() {
+                const now = new Date().getTime();
+                const distance = targetDate.getTime() - now;
+
+                if (distance < 0) {
+                    // Date has passed
+                    document.getElementById('days').innerText = '0';
+                    document.getElementById('hours').innerText = '0';
+                    document.getElementById('minutes').innerText = '0';
+                    document.getElementById('seconds').innerText = '0';
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById('days').innerText = days;
+                document.getElementById('hours').innerText = String(hours).padStart(2, '0');
+                document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
+            }
+
+            // Update immediately
+            updateCountdown();
+            
+            // Update every second
+            setInterval(updateCountdown, 1000);
+        }
+
+        // --- HEART TRANSITION LOGIC ---
+        function triggerHeartTransition() {
+            const container = document.getElementById('heart-transition-container');
+            container.classList.add('heart-explode');
+            
+            setTimeout(() => {
+                processSummaryData();
+                nextScreen('screen4');
+                startCountdown(); // Start the countdown timer
+            }, 750);
+
+            setTimeout(() => {
+                container.classList.remove('heart-explode');
+                startCelebrationConfetti();
+            }, 1500);
+        }
+
+        function processSummaryData() {
+            const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+            const formattedDate = finalSelectedDate.toLocaleDateString(undefined, options);
+
+            document.getElementById('finalDate').textContent = formattedDate;
+            document.getElementById('finalTime').textContent = finalSelectedTime;
+            document.getElementById('finalFood').textContent = chosenFood;
+        }
+
+        // --- CONFETTI ENGINE ---
+        function startCelebrationConfetti() {
+            const canvas = document.getElementById('celebration-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const colors = ['#ff4081', '#ff80ab', '#ffb6c1', '#ff1744', '#fafafa', '#ffeb3b'];
+            const shapes = ['circle', 'heart', 'star'];
+
+            class Particle {
+                constructor() {
+                    this.x = canvas.width / 2;
+                    this.y = canvas.height + 20; 
+                    this.radius = Math.random() * 8 + 4;
+                    this.speedX = Math.random() * 12 - 6;
+                    this.speedY = Math.random() * -15 - 10;
+                    this.gravity = 0.25;
+                    this.color = colors[Math.floor(Math.random() * colors.length)];
+                    this.shape = shapes[Math.floor(Math.random() * shapes.length)];
+                    this.opacity = 1;
+                    this.rotation = Math.random() * 360;
+                    this.rotationSpeed = Math.random() * 4 - 2;
+                }
+                update() {
+                    this.speedY += this.gravity;
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    this.rotation += this.rotationSpeed;
+                    if (this.speedY > 0) this.opacity -= 0.012; 
+                }
+                draw() {
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    ctx.rotate((this.rotation * Math.PI) / 180);
+                    ctx.globalAlpha = Math.max(0, this.opacity);
+                    ctx.fillStyle = this.color;
+
+                    if (this.shape === 'circle') {
+                        ctx.beginPath();
+                        ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else if (this.shape === 'heart') {
+                        ctx.beginPath();
+                        let r = this.radius;
+                        ctx.moveTo(0, -r/2);
+                        ctx.bezierCurveTo(r/2, -r, r, -r/3, 0, r);
+                        ctx.bezierCurveTo(-r, -r/3, -r/2, -r, 0, -r/2);
+                        ctx.fill();
+                    } else { 
+                        ctx.beginPath();
+                        for (let i = 0; i < 5; i++) {
+                            ctx.lineTo(Math.cos((18 + i * 72) * Math.PI / 180) * this.radius, -Math.sin((18 + i * 72) * Math.PI / 180) * this.radius);
+                            ctx.lineTo(Math.cos((54 + i * 72) * Math.PI / 180) * (this.radius/2), -Math.sin((54 + i * 72) * Math.PI / 180) * (this.radius/2));
+                        }
+                        ctx.closePath();
+                        ctx.fill();
+                    }
+                    ctx.restore();
+                }
+            }
+
+            for (let i = 0; i < 150; i++) {
+                setTimeout(() => { particles.push(new Particle()); }, Math.random() * 400);
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    particles[i].update();
+                    particles[i].draw();
+                    if (particles[i].opacity <= 0 || particles[i].y > canvas.height + 50) {
+                        particles.splice(i, 1);
+                    }
+                }
+                if (particles.length > 0) {
+                    requestAnimationFrame(animate);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+            animate();
+        }
+
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('celebration-canvas');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
